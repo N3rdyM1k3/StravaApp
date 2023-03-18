@@ -7,4 +7,8 @@
     <RootNamespace>strava_profisee</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.Strava" Version="7.0.0" />
+  </ItemGroup>
+
 </Project>
