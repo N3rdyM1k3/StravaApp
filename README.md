@@ -3,7 +3,6 @@ This is an app I am creating to track strava data for my company's fitness chall
 
 
 #TODO
-- Fix Build: 
-    - https://github.com/N3rdyM1k3/StravaApp/actions/runs/4456912943
-    - https://learn.microsoft.com/en-us/azure/developer/github/deploy-to-azure
+- Strava OAuth
+    - https://github.com/aspnet-contrib/AspNet.Security.OAuth.Providers
 https://learn.microsoft.com/en-us/dotnet/architecture/microservices/secure-net-microservices-web-applications/
