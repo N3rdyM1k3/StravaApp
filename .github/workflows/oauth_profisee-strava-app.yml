@@ -26,7 +26,7 @@ jobs:
         run: dotnet build strava-profisee --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/strava-profisee
+        run: dotnet publish strava-profisee -c Release -o ${{env.DOTNET_ROOT}}/strava-profisee
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
