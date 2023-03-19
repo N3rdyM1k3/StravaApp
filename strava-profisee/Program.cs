@@ -16,7 +16,7 @@ SecretClientOptions options = new SecretClientOptions()
 var client = new SecretClient(new Uri("https://profisee-strava-keyvault.vault.azure.net/"), new DefaultAzureCredential(),options);
 
 KeyVaultSecret clientId = client.GetSecret("ClientId");
-KeyVaultSecret clientSecret = client.GetSecret("ClientId");
+KeyVaultSecret clientSecret = client.GetSecret("ClientSecret");
 
 var app = WebApplication.Create(args);
 // var stravaClient = new StravaClient();
