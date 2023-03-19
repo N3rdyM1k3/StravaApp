@@ -15,21 +15,19 @@ SecretClientOptions options = new SecretClientOptions()
     };
 var client = new SecretClient(new Uri("https://profisee-strava-keyvault.vault.azure.net/"), new DefaultAzureCredential(),options);
 
-KeyVaultSecret secret = client.GetSecret("ClientId");
-
-string secretValue = secret.Value;
+KeyVaultSecret clientId = client.GetSecret("ClientId");
+KeyVaultSecret clientSecret = client.GetSecret("ClientId");
 
 var app = WebApplication.Create(args);
 // var stravaClient = new StravaClient();
-// var builder = WebApplication.CreateBuilder(args);
-// builder.Services.AddAuthentication().AddStrava(options =>
-// {
-//     options.ClientId = "";
-//     options.ClientSecret = "";
-// }
-// );
-// app.UseAuthentication();
-// app.UseAuthorization();
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddAuthentication().AddStrava(options =>
+{
+    options.ClientId = clientId.Value;
+    options.ClientSecret = clientSecret.Value;
+}
+);
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapGet("/", () => "Hello World");
-app.MapGet("/cid", () => secretValue);
 app.Run();
