@@ -18,16 +18,20 @@ var client = new SecretClient(new Uri("https://profisee-strava-keyvault.vault.az
 KeyVaultSecret clientId = client.GetSecret("ClientId");
 KeyVaultSecret clientSecret = client.GetSecret("ClientSecret");
 
-var app = WebApplication.Create(args);
 // var stravaClient = new StravaClient();
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddAuthentication().AddStrava(options =>
 {
     options.ClientId = clientId.Value;
     options.ClientSecret = clientSecret.Value;
-}
-);
+});
+builder.Services.AddAuthorization();
+
+var app = builder.Build();
+
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapGet("/", () => "Hello World");
+app.MapGet("/", () => "Hello World").AllowAnonymous();
+app.MapGet("/auth", () => "Auth").RequireAuthorization();
 app.Run();
