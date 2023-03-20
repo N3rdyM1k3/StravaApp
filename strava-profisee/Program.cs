@@ -17,7 +17,13 @@ SecretClientOptions options = new SecretClientOptions()
          }
     };
 var client = new SecretClient(new Uri("https://profisee-strava-keyvault.vault.azure.net/"), new DefaultAzureCredential(),options);
-
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders =
+                ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        });
+builder.Services.AddAuthorization();
 
 KeyVaultSecret clientId = client.GetSecret("ClientId");
 KeyVaultSecret clientSecret = client.GetSecret("ClientSecret");
@@ -31,7 +37,7 @@ var clientSecretValue = clientId.Value;
 // var clientSecretValue = "1234";
 
 // var stravaClient = new StravaClient();
-var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 .AddCookie(o => o.LoginPath = new PathString("/login"))
 .AddStrava(options =>
@@ -39,18 +45,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.ClientId = clientIdValue;
     options.ClientSecret = clientSecretValue;
 });
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
-        {
-            options.ForwardedHeaders =
-                ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-        });
-builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseForwardedHeaders();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseForwardedHeaders();
+
 app.MapGet("/", () => "Hello World").AllowAnonymous();
 app.MapGet("/login", () => "Auth").RequireAuthorization();
 app.Run();
