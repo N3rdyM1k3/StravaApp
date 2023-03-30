@@ -44,6 +44,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 {
     options.ClientId = clientIdValue;
     options.ClientSecret = clientSecretValue;
+    options.AuthorizationEndpoint = "https://www.strava.com/oauth/authorize";
 });
 
 var app = builder.Build();
