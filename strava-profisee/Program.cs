@@ -23,7 +23,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
             options.ForwardedHeaders =
                 ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
         });
-builder.Services.AddAuthorization();
+
 
 KeyVaultSecret clientId = client.GetSecret("ClientId");
 KeyVaultSecret clientSecret = client.GetSecret("ClientSecret");
@@ -46,6 +46,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.ClientSecret = clientSecretValue;
     options.AuthorizationEndpoint = "https://www.strava.com/oauth/authorize";
 });
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
