@@ -54,5 +54,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/", () => "Hello World").AllowAnonymous();
-app.MapGet("/login", () => "Auth").RequireAuthorization();
+app.MapGet("/login", () => "Auth");
 app.Run();
