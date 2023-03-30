@@ -60,4 +60,5 @@ app.UseForwardedHeaders();
 
 app.MapGet("/", () => "Hello World"); // .AllowAnonymous();
 app.MapGet("/login", () => "Auth").RequireAuthorization();
+app.MapPost("/signin-strava", async (AuthResponse r) => { return Results.Ok(r.access_token);}).AllowAnonymous();
 app.Run();
