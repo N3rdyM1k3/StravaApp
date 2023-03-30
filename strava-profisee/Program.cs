@@ -53,6 +53,6 @@ app.UseForwardedHeaders();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => "Hello World").AllowAnonymous();
+app.MapGet("/", () => "Hello World"); // .AllowAnonymous();
 app.MapGet("/login", () => "Auth");
 app.Run();
