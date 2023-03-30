@@ -2,6 +2,7 @@ using StravaProfisee;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Azure.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -38,7 +39,11 @@ var clientSecretValue = clientId.Value;
 
 // var stravaClient = new StravaClient();
 
-builder.Services.AddAuthentication()
+builder.Services.AddAuthentication(options => {
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = "Strava";
+    })
+    .AddCookie()
 .AddStrava(options =>
 {
     options.ClientId = clientIdValue;
@@ -50,8 +55,8 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 app.UseForwardedHeaders();
-app.UseAuthentication();
-app.UseAuthorization();
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 app.MapGet("/", () => "Hello World"); // .AllowAnonymous();
 app.MapGet("/login", () => "Auth").RequireAuthorization();
