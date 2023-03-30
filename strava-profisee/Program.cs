@@ -38,8 +38,7 @@ var clientSecretValue = clientId.Value;
 
 // var stravaClient = new StravaClient();
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-.AddCookie(o => o.LoginPath = new PathString("/Account/login"))
+builder.Services.AddAuthentication()
 .AddStrava(options =>
 {
     options.ClientId = clientIdValue;
