@@ -49,17 +49,17 @@ builder.Services.AddAuthentication(options => {
 {
     options.ClientId = clientIdValue;
     options.ClientSecret = clientSecretValue;
-    options.AuthorizationEndpoint = "https://www.strava.com/oauth/authorize";
-    options.TokenEndpoint = "https://www.strava.com/api/v3/oauth/token";
-    options.CallbackPath = "/signin-strava";
+    // options.AuthorizationEndpoint = "https://www.strava.com/oauth/authorize";
+    // options.TokenEndpoint = "https://www.strava.com/api/v3/oauth/token";
+    // options.CallbackPath = "/signin-strava";
 });
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
 app.UseForwardedHeaders();
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapGet("/", () => "Hello World"); // .AllowAnonymous();
 app.MapGet("/login", () => "Auth").RequireAuthorization();
