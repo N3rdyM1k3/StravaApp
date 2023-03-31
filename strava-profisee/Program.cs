@@ -41,6 +41,7 @@ var clientSecretValue = clientId.Value;
 
 builder.Services.AddAuthentication(options => {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = "Strava";
     })
     .AddCookie(o => o.LoginPath = "/signin-strava")
