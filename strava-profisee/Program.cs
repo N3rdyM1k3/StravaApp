@@ -43,12 +43,13 @@ builder.Services.AddAuthentication(options => {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = "Strava";
     })
-    .AddCookie()
+    .AddCookie(o => o.LoginPath = "/signin-strava")
 .AddStrava(options =>
 {
     options.ClientId = clientIdValue;
     options.ClientSecret = clientSecretValue;
     options.AuthorizationEndpoint = "https://www.strava.com/oauth/authorize";
+    options.TokenEndpoint = "https://www.strava.com/api/v3/oauth/token";
 });
 builder.Services.AddAuthorization();
 
@@ -60,5 +61,5 @@ app.UseForwardedHeaders();
 
 app.MapGet("/", () => "Hello World"); // .AllowAnonymous();
 app.MapGet("/login", () => "Auth").RequireAuthorization();
-app.MapPost("/signin-strava", async (AuthResponse r) => { return Results.Ok(r.access_token);}).AllowAnonymous();
+//app.MapPost("/signin-strava", async (AuthResponse r) => { return Results.Ok(r.access_token);}).AllowAnonymous();
 app.Run();
