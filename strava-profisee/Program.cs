@@ -44,13 +44,14 @@ builder.Services.AddAuthentication(options => {
     options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = "Strava";
     })
-    .AddCookie(o => o.LoginPath = "/signin-strava")
+    .AddCookie()
 .AddStrava(options =>
 {
     options.ClientId = clientIdValue;
     options.ClientSecret = clientSecretValue;
     options.AuthorizationEndpoint = "https://www.strava.com/oauth/authorize";
     options.TokenEndpoint = "https://www.strava.com/api/v3/oauth/token";
+    options.CallbackPath = "/signin-strava";
 });
 builder.Services.AddAuthorization();
 
