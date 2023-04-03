@@ -52,6 +52,7 @@ builder.Services.AddAuthentication(options => {
     // options.AuthorizationEndpoint = "https://www.strava.com/oauth/authorize";
     // options.TokenEndpoint = "https://www.strava.com/api/v3/oauth/token";
     // options.CallbackPath = "/signin-strava";
+    options.Scope.Add("read_all");
 });
 builder.Services.AddAuthorization();
 
