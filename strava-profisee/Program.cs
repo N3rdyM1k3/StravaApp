@@ -74,7 +74,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/", () => "Hello World"); // .AllowAnonymous();
-app.MapGet("/secrets", () => $"s:{clientSecretValue} i:{clientIdValue}");
 
 app.MapGet("/signin-strava", async (HttpContext c) => {
     var authFeatures = c.Features.Get<IAuthenticateResultFeature>();
