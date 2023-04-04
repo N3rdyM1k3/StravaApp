@@ -7,4 +7,10 @@
     <RootNamespace>strava_profisee</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.Strava" Version="7.0.0" />
+    <PackageReference Include="Azure.Identity" Version="1.8.2" />
+    <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.5.0" />
+  </ItemGroup>
+
 </Project>
