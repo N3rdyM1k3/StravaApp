@@ -29,7 +29,6 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 // var clientIdValue = clientId.Value;
 // var clientSecretValue = clientSecret.Value;
 
-
 builder.Services.AddAuthentication(options => {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -38,8 +37,8 @@ builder.Services.AddAuthentication(options => {
     .AddCookie()
 .AddStrava(options =>
 {
-    options.ClientId = "104109"; //clientIdValue;
-    options.ClientSecret = "f428bda73a3b4a62b35f353767f6d584e557f429";// clientSecretValue;
+    options.ClientId = "104109";
+    options.ClientSecret = "f428bda73a3b4a62b35f353767f6d584e557f429";
     options.Scope.Add("read_all");
     options.SaveTokens = true;
 });
