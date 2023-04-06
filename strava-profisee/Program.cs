@@ -15,7 +15,7 @@ SecretClientOptions options = new SecretClientOptions()
             Mode = RetryMode.Exponential
          }
     };
-var client = new SecretClient(new Uri("https://profisee-strava-keyvault.vault.azure.net/"), new DefaultAzureCredential(),options);
+// var client = new SecretClient(new Uri("https://profisee-strava-keyvault.vault.azure.net/"), new DefaultAzureCredential(),options);
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
@@ -24,10 +24,11 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
         });
 
 
-KeyVaultSecret clientId = client.GetSecret("ClientId");
-KeyVaultSecret clientSecret = client.GetSecret("ClientSecret");
-var clientIdValue = clientId.Value;
-var clientSecretValue = clientSecret.Value;
+// KeyVaultSecret clientId = client.GetSecret("ClientId");
+// KeyVaultSecret clientSecret = client.GetSecret("ClientSecret");
+// var clientIdValue = clientId.Value;
+// var clientSecretValue = clientSecret.Value;
+
 
 builder.Services.AddAuthentication(options => {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -37,14 +38,22 @@ builder.Services.AddAuthentication(options => {
     .AddCookie()
 .AddStrava(options =>
 {
-    options.ClientId = clientIdValue;
-    options.ClientSecret = clientSecretValue;
+    options.ClientId = "104109"; //clientIdValue;
+    options.ClientSecret = "f428bda73a3b4a62b35f353767f6d584e557f429";// clientSecretValue;
     options.Scope.Add("read_all");
     options.SaveTokens = true;
 });
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    // HttpOnly =  HttpOnlyPolicy.Always,
+    MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None,
+    Secure = CookieSecurePolicy.Always
+    // MinimumSameSitePolicy = SameSiteMode.Lax
+});
 
 app.UseForwardedHeaders();
 app.UseAuthentication();
@@ -53,5 +62,5 @@ app.UseAuthorization();
 app.MapGet("/", () => "Hello World");
 
 
-app.MapGet("/test", async (HttpContext c) => await StravaClient.HandleAprilChallenge(c)).RequireAuthorization();
+app.MapGet("/test", async (HttpContext c) => {return await StravaClient.HandleAprilChallenge(c);}).RequireAuthorization();
 app.Run();

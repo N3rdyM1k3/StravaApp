@@ -9,7 +9,7 @@ internal static class StravaClient {
             var client = new HttpClient();
             client.DefaultRequestHeaders.Add("Authorization", "Bearer " + access_token);
             var resp = await client.GetAsync("https://www.strava.com/api/v3/clubs/Profisee1/activities");
-            return await resp.Content.ReadAsStringAsync();   
+            return await resp.Content.ReadAsStringAsync();    
     }
 }
 }
