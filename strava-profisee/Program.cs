@@ -45,40 +45,14 @@ builder.Services.AddAuthentication(options => {
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
-// app.UseCookiePolicy(new CookiePolicyOptions
-// {
-//     MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None,
-//     Secure = CookieSecurePolicy.Always
-// });
 
 app.UseForwardedHeaders();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => "Hello World"); // .AllowAnonymous();
+app.MapGet("/", () => "Hello World");
 
-// app.MapGet("/signin-strava", async (HttpContext c) => {
-//     var authFeatures = c.Features.Get<IAuthenticateResultFeature>();
-//     var authProps = authFeatures.AuthenticateResult.Properties;
-//     var t = authProps.GetTokens();
-//     var a = c.Request.Headers[HeaderNames.Authorization];
-//     var g = await c.GetTokenAsync("Strava", "access_token"); 
 
-//  return a; 
-
-//});
-// app.MapGet("/login", async (HttpContext c) => {
-//     var authFeatures = c.Features.Get<IAuthenticateResultFeature>();
-//     var authProps = authFeatures.AuthenticateResult.Properties;
-//     var t = authProps.GetTokens();
-//     var a = c.Request.Headers[HeaderNames.Authorization];
-//     var g = await c.GetTokenAsync("Strava", "access_token"); 
-
-//  return a; 
-//  var client = new HttpClient();
-//  var resp = await client.GetAsync("https://www.strava.com/api/v3/clubs/Profisee1/activities");
-//  return resp;
-// }).RequireAuthorization();
 app.MapGet("/test", async (HttpContext c) => {
     var g = await c.GetTokenAsync("Strava", "access_token"); 
     var client = new HttpClient();
@@ -86,5 +60,4 @@ app.MapGet("/test", async (HttpContext c) => {
     var resp = await client.GetAsync("https://www.strava.com/api/v3/clubs/Profisee1/activities");
     return await resp.Content.ReadAsStringAsync();
 }).RequireAuthorization();
-//app.MapPost("/signin-strava", async (AuthResponse r) => { return Results.Ok(r.access_token);}).AllowAnonymous();
 app.Run();
