@@ -3,7 +3,7 @@ using Azure.Security.KeyVault.Secrets;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Azure.Core;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Authentication;
+using StravaProfisee;
 
 SecretClientOptions options = new SecretClientOptions()
     {
@@ -53,11 +53,5 @@ app.UseAuthorization();
 app.MapGet("/", () => "Hello World");
 
 
-app.MapGet("/test", async (HttpContext c) => {
-    var g = await c.GetTokenAsync("Strava", "access_token"); 
-    var client = new HttpClient();
-    client.DefaultRequestHeaders.Add("Authorization", "Bearer " + g);
-    var resp = await client.GetAsync("https://www.strava.com/api/v3/clubs/Profisee1/activities");
-    return await resp.Content.ReadAsStringAsync();
-}).RequireAuthorization();
+app.MapGet("/test", (HttpContext c) => StravaClient.HandleAprilChallenge).RequireAuthorization();
 app.Run();
