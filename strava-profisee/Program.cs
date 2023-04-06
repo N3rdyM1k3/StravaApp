@@ -53,5 +53,5 @@ app.UseAuthorization();
 app.MapGet("/", () => "Hello World");
 
 
-app.MapGet("/test", (HttpContext c) => StravaClient.HandleAprilChallenge).RequireAuthorization();
+app.MapGet("/test", async (HttpContext c) => await StravaClient.HandleAprilChallenge(c)).RequireAuthorization();
 app.Run();
