@@ -42,13 +42,13 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 
-// app.UseCookiePolicy(new CookiePolicyOptions
-// {
-//     // HttpOnly =  HttpOnlyPolicy.Always,
-//     MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None,
-//     Secure = CookieSecurePolicy.Always
-//     // MinimumSameSitePolicy = SameSiteMode.Lax
-// });
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    // HttpOnly =  HttpOnlyPolicy.Always,
+    MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None,
+    Secure = CookieSecurePolicy.Always
+    // MinimumSameSitePolicy = SameSiteMode.Lax
+});
 
 app.UseForwardedHeaders();
 app.UseAuthentication();
@@ -57,5 +57,5 @@ app.UseAuthorization();
 app.MapGet("/", () => "Hello World");
 
 
-app.MapGet("/test", async (HttpContext c) => {return await StravaClient.HandleAprilChallenge(c);}).RequireAuthorization();
+app.MapGet("forward/{*path}", async (HttpContext c, string path) => {return await StravaClient.ForwardRequest(c, path);}).RequireAuthorization();
 app.Run();
