@@ -55,6 +55,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/", () => "Hello World");
+app.MapGet("/may", async (HttpContext c) => {return await StravaClient.HandleMayChallenge(c);}).RequireAuthorization();
 
 
 app.MapGet("forward/{*path}", async (HttpContext c, string path) => {return await StravaClient.ForwardRequest(c, path);}).RequireAuthorization();
