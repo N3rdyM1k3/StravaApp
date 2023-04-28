@@ -6,7 +6,7 @@ name: Build and deploy ASP.Net Core app to Azure Web App - profisee-strava-app
 on:
   push:
     branches:
-      - oauth
+      - april-challenge
   workflow_dispatch:
 
 jobs:

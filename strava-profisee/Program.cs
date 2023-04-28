@@ -3,7 +3,7 @@ using Azure.Security.KeyVault.Secrets;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Azure.Core;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Authentication;
+using StravaProfisee;
 
 SecretClientOptions options = new SecretClientOptions()
     {
@@ -15,7 +15,6 @@ SecretClientOptions options = new SecretClientOptions()
             Mode = RetryMode.Exponential
          }
     };
-var client = new SecretClient(new Uri("https://profisee-strava-keyvault.vault.azure.net/"), new DefaultAzureCredential(),options);
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
@@ -24,10 +23,6 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
         });
 
 
-KeyVaultSecret clientId = client.GetSecret("ClientId");
-KeyVaultSecret clientSecret = client.GetSecret("ClientSecret");
-var clientIdValue = clientId.Value;
-var clientSecretValue = clientSecret.Value;
 
 builder.Services.AddAuthentication(options => {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -37,54 +32,30 @@ builder.Services.AddAuthentication(options => {
     .AddCookie()
 .AddStrava(options =>
 {
-    options.ClientId = clientIdValue;
-    options.ClientSecret = clientSecretValue;
+    options.ClientId = "104109";
+    options.ClientSecret = "f428bda73a3b4a62b35f353767f6d584e557f429";
     options.Scope.Add("read_all");
     options.SaveTokens = true;
 });
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
-// app.UseCookiePolicy(new CookiePolicyOptions
-// {
-//     MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None,
-//     Secure = CookieSecurePolicy.Always
-// });
+
+
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    // HttpOnly =  HttpOnlyPolicy.Always,
+    MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None,
+    Secure = CookieSecurePolicy.Always
+    // MinimumSameSitePolicy = SameSiteMode.Lax
+});
 
 app.UseForwardedHeaders();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => "Hello World"); // .AllowAnonymous();
+app.MapGet("/", () => "Hello World");
 
-// app.MapGet("/signin-strava", async (HttpContext c) => {
-//     var authFeatures = c.Features.Get<IAuthenticateResultFeature>();
-//     var authProps = authFeatures.AuthenticateResult.Properties;
-//     var t = authProps.GetTokens();
-//     var a = c.Request.Headers[HeaderNames.Authorization];
-//     var g = await c.GetTokenAsync("Strava", "access_token"); 
 
-//  return a; 
-
-//});
-// app.MapGet("/login", async (HttpContext c) => {
-//     var authFeatures = c.Features.Get<IAuthenticateResultFeature>();
-//     var authProps = authFeatures.AuthenticateResult.Properties;
-//     var t = authProps.GetTokens();
-//     var a = c.Request.Headers[HeaderNames.Authorization];
-//     var g = await c.GetTokenAsync("Strava", "access_token"); 
-
-//  return a; 
-//  var client = new HttpClient();
-//  var resp = await client.GetAsync("https://www.strava.com/api/v3/clubs/Profisee1/activities");
-//  return resp;
-// }).RequireAuthorization();
-app.MapGet("/test", async (HttpContext c) => {
-    var g = await c.GetTokenAsync("Strava", "access_token"); 
-    var client = new HttpClient();
-    client.DefaultRequestHeaders.Add("Authorization", "Bearer " + g);
-    var resp = await client.GetAsync("https://www.strava.com/api/v3/clubs/Profisee1/activities");
-    return await resp.Content.ReadAsStringAsync();
-}).RequireAuthorization();
-//app.MapPost("/signin-strava", async (AuthResponse r) => { return Results.Ok(r.access_token);}).AllowAnonymous();
+app.MapGet("forward/{*path}", async (HttpContext c, string path) => {return await StravaClient.ForwardRequest(c, path);}).RequireAuthorization();
 app.Run();
