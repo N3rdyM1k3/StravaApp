@@ -5,17 +5,18 @@ using Azure.Core;
 using Microsoft.AspNetCore.HttpOverrides;
 using StravaProfisee;
 
-SecretClientOptions options = new SecretClientOptions()
-    {
-        Retry =
-        {
-            Delay= TimeSpan.FromSeconds(2),
-            MaxDelay = TimeSpan.FromSeconds(16),
-            MaxRetries = 5,
-            Mode = RetryMode.Exponential
-         }
-    };
+
 var builder = WebApplication.CreateBuilder(args);
+
+(string? clientId, string? clientSecret) stravaCreds;
+if (builder.Environment.IsDevelopment()){
+    stravaCreds = SecretStore.ReadFromAppSettings(builder.Configuration);
+}
+else {
+    stravaCreds = SecretStore.ReadFromAzureKeyVault();
+}
+
+
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders =
@@ -32,8 +33,8 @@ builder.Services.AddAuthentication(options => {
     .AddCookie()
 .AddStrava(options =>
 {
-    options.ClientId = "104109";
-    options.ClientSecret = "f428bda73a3b4a62b35f353767f6d584e557f429";
+    options.ClientId = stravaCreds.clientId ?? throw new Exception("Null Client Id");
+    options.ClientSecret = stravaCreds.clientSecret ?? throw new Exception("Null Client Secret");
     options.Scope.Add("read_all");
     options.SaveTokens = true;
 });
@@ -41,14 +42,16 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment()){
+    app.UseCookiePolicy(new CookiePolicyOptions
+    {
+        // HttpOnly =  HttpOnlyPolicy.Always,
+        MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None,
+        Secure = CookieSecurePolicy.Always
+        // MinimumSameSitePolicy = SameSiteMode.Lax
+    });
+}
 
-app.UseCookiePolicy(new CookiePolicyOptions
-{
-    // HttpOnly =  HttpOnlyPolicy.Always,
-    MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None,
-    Secure = CookieSecurePolicy.Always
-    // MinimumSameSitePolicy = SameSiteMode.Lax
-});
 
 app.UseForwardedHeaders();
 app.UseAuthentication();

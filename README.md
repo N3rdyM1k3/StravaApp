@@ -1,7 +1,11 @@
 # StravaApp
 
 ## Getting Started
-- Local Dev: copy appsettings.json and create appsettings.Development.json 
+- Local Dev: Create appsettings.Development.json and add the following: 
+  "StravaCredentials": {
+    "ClientId": "", 
+    "ClientSecret": ""
+  }
 
 
 Example URL: 
