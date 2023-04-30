@@ -8,12 +8,12 @@ using StravaProfisee;
 
 var builder = WebApplication.CreateBuilder(args);
 
-(string? clientId, string? clientSecret) stravaCreds;
+StravaCredentials? creds = null;
 if (builder.Environment.IsDevelopment()){
-    stravaCreds = SecretStore.ReadFromAppSettings(builder.Configuration);
+    creds = CredentialStore.ReadFromAppSettings(builder.Configuration);
 }
 else {
-    stravaCreds = SecretStore.ReadFromAzureKeyVault();
+    creds = CredentialStore.ReadFromAzureKeyVault();
 }
 
 
@@ -33,8 +33,8 @@ builder.Services.AddAuthentication(options => {
     .AddCookie()
 .AddStrava(options =>
 {
-    options.ClientId = stravaCreds.clientId ?? throw new Exception("Null Client Id");
-    options.ClientSecret = stravaCreds.clientSecret ?? throw new Exception("Null Client Secret");
+    options.ClientId = creds.ClientId ?? throw new Exception("Null Client Id");
+    options.ClientSecret = creds.ClientSecret ?? throw new Exception("Null Client Secret");
     options.Scope.Add("read_all");
     options.SaveTokens = true;
 });
@@ -62,4 +62,18 @@ app.MapGet("/may", async (HttpContext c) => {return await StravaClient.HandleMay
 
 
 app.MapGet("forward/{*path}", async (HttpContext c, string path) => {return await StravaClient.ForwardRequest(c, path);}).RequireAuthorization();
+
+
+if (app.Environment.IsDevelopment()){
+    app.MapGet("/new_tokens", async (HttpContext c) => {return await StravaClient.ReadTokens(c);}).RequireAuthorization();
+    // app.MapGet("/refresh_token", async () => { return await StravaClient.RefreshTokenPrint(creds);} );
+}
+else {
+    await StravaClient.RefreshTokenInline(creds);
+    await CredentialStore.SaveToAzureKeyVault(creds);
+    //app.MapGet("/test/{*path}", async (HttpContext c, string path) => {return await StravaClient.Test(c, creds.AccessToken, path);});
+}
+
+app.MapGet("/test/{*path}", async (HttpContext c, string path) => {return await StravaClient.Test(c, creds.AccessToken, path);});
+
 app.Run();
