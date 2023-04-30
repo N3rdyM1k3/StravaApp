@@ -66,7 +66,7 @@ app.MapGet("forward/{*path}", async (HttpContext c, string path) => {return awai
 
 if (app.Environment.IsDevelopment()){
     app.MapGet("/new_tokens", async (HttpContext c) => {return await StravaClient.ReadTokens(c);}).RequireAuthorization();
-    // app.MapGet("/refresh_token", async () => { return await StravaClient.RefreshTokenPrint(creds);} );
+    app.MapGet("/refresh_token", async () => { return await StravaClient.RefreshTokenPrint(creds);} );
 }
 else {
     await StravaClient.RefreshTokenInline(creds);

@@ -79,8 +79,10 @@ namespace StravaProfisee
             var client = new HttpClient();
             var httpContent = new StringContent(body, Encoding.UTF8, "application/json");
             var resp = await client.PostAsync("https://www.strava.com/oauth/token", httpContent);
-            return await resp.Content.ReadAsStringAsync();
-            }
+
+            var tokenResp = await resp.Content.ReadFromJsonAsync<TokenResponse>();
+            return $"AccessToken: {tokenResp.access_token}\n RefreshToken: {tokenResp.refresh_token}";
+        }
 
         internal static async Task<string> Test(HttpContext context, string accessToken, string path)
         {
