@@ -5,17 +5,18 @@ using Azure.Core;
 using Microsoft.AspNetCore.HttpOverrides;
 using StravaProfisee;
 
-SecretClientOptions options = new SecretClientOptions()
-    {
-        Retry =
-        {
-            Delay= TimeSpan.FromSeconds(2),
-            MaxDelay = TimeSpan.FromSeconds(16),
-            MaxRetries = 5,
-            Mode = RetryMode.Exponential
-         }
-    };
+
 var builder = WebApplication.CreateBuilder(args);
+
+StravaCredentials? creds = null;
+if (builder.Environment.IsDevelopment()){
+    creds = CredentialStore.ReadFromAppSettings(builder.Configuration);
+}
+else {
+    creds = CredentialStore.ReadFromAzureKeyVault();
+}
+
+
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders =
@@ -32,8 +33,8 @@ builder.Services.AddAuthentication(options => {
     .AddCookie()
 .AddStrava(options =>
 {
-    options.ClientId = "104109";
-    options.ClientSecret = "f428bda73a3b4a62b35f353767f6d584e557f429";
+    options.ClientId = creds.ClientId ?? throw new Exception("Null Client Id");
+    options.ClientSecret = creds.ClientSecret ?? throw new Exception("Null Client Secret");
     options.Scope.Add("read_all");
     options.SaveTokens = true;
 });
@@ -41,22 +42,33 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment()){
+    app.UseCookiePolicy(new CookiePolicyOptions
+    {
+        MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None,
+        Secure = CookieSecurePolicy.Always
+    });
+}
 
-app.UseCookiePolicy(new CookiePolicyOptions
-{
-    // HttpOnly =  HttpOnlyPolicy.Always,
-    MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None,
-    Secure = CookieSecurePolicy.Always
-    // MinimumSameSitePolicy = SameSiteMode.Lax
-});
 
 app.UseForwardedHeaders();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => "Hello World");
+
+
+if (app.Environment.IsDevelopment()){
+    app.MapGet("/new_tokens", async (HttpContext c) => {return await StravaClient.ReadTokens(c);}).RequireAuthorization();
+    app.MapGet("/refresh_token", async () => { return await StravaClient.RefreshTokenPrint(creds);} );
+}
+else {
+    await StravaClient.RefreshTokenInline(creds);
+    await CredentialStore.SaveToAzureKeyVault(creds);
+}
+
+app.MapGet("/", () => "Welcome to the Profisee Strava Bot API!");
 app.MapGet("/may", async (HttpContext c) => {return await StravaClient.HandleMayChallenge(c);}).RequireAuthorization();
-
-
 app.MapGet("forward/{*path}", async (HttpContext c, string path) => {return await StravaClient.ForwardRequest(c, path);}).RequireAuthorization();
+app.MapGet("/test/{*path}", async (HttpContext c, string path) => {return await StravaClient.Test(c, creds.AccessToken, path);});
+
 app.Run();

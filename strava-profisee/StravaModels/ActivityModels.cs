@@ -1,3 +1,5 @@
+namespace StravaProfisee.StravaModels;
+
 public class Activity {
     public string name {get; set; }
 
