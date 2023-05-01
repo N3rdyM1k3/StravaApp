@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication;
+using StravaProfisee.StravaModels;
 
 namespace StravaProfisee
 {

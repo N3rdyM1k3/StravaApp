@@ -45,10 +45,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment()){
     app.UseCookiePolicy(new CookiePolicyOptions
     {
-        // HttpOnly =  HttpOnlyPolicy.Always,
         MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None,
         Secure = CookieSecurePolicy.Always
-        // MinimumSameSitePolicy = SameSiteMode.Lax
     });
 }
 
@@ -57,11 +55,6 @@ app.UseForwardedHeaders();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => "Hello World");
-app.MapGet("/may", async (HttpContext c) => {return await StravaClient.HandleMayChallenge(c);}).RequireAuthorization();
-
-
-app.MapGet("forward/{*path}", async (HttpContext c, string path) => {return await StravaClient.ForwardRequest(c, path);}).RequireAuthorization();
 
 
 if (app.Environment.IsDevelopment()){
@@ -71,9 +64,11 @@ if (app.Environment.IsDevelopment()){
 else {
     await StravaClient.RefreshTokenInline(creds);
     await CredentialStore.SaveToAzureKeyVault(creds);
-    //app.MapGet("/test/{*path}", async (HttpContext c, string path) => {return await StravaClient.Test(c, creds.AccessToken, path);});
 }
 
+app.MapGet("/", () => "Welcome to the Profisee Strava Bot API!");
+app.MapGet("/may", async (HttpContext c) => {return await StravaClient.HandleMayChallenge(c);}).RequireAuthorization();
+app.MapGet("forward/{*path}", async (HttpContext c, string path) => {return await StravaClient.ForwardRequest(c, path);}).RequireAuthorization();
 app.MapGet("/test/{*path}", async (HttpContext c, string path) => {return await StravaClient.Test(c, creds.AccessToken, path);});
 
 app.Run();
