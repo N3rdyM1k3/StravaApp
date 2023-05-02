@@ -38,9 +38,9 @@ namespace StravaProfisee
         private static string formatMay(List<Activity> activities){
             var resp = new StringBuilder();
             var sum = activities.Select(a => a.elapsed_time).Sum().ToString(); 
-            resp.AppendLine($"Total Seconds: {sum}");
-            resp.AppendLine("=================Details===================");
-            activities.ForEach(a => resp.AppendLine($"{a.athlete.firstname} {a.athlete.lastname} -- {a.name}: {a.elapsed_time} seconds"));
+            resp.Append($"Total Seconds: {sum}\n\n");
+            resp.Append("=================Details===================\n\n");
+            activities.ForEach(a => resp.Append($"{a.athlete.firstname} {a.athlete.lastname} -- {a.name}: {a.elapsed_time} seconds\n\n"));
             return resp.ToString();
         }
 
